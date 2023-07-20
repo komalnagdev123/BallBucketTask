@@ -1,6 +1,6 @@
 Project Setup Steps:-
 
-1) First take clone of project from git.
+1) First take clone of project from git. (https://github.com/komalnagdev123/BallBucketTask.git)
 
 2) Run composer Update command.
 
