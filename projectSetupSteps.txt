@@ -1,0 +1,11 @@
+Project Setup Steps:-
+
+1) First take clone of project from git.
+
+2) Run composer Update command.
+
+3) Create DB. Attached is the DB for your reference you can use that.
+
+4) Change ENV. file details like DB name, App Url, DB credentials etc.
+
+5) If not using DB run :- php artisan migrate command.
