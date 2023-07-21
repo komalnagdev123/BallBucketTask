@@ -54,6 +54,8 @@ class BallController extends Controller
         $quantity = $request->quantity;
         $purchasedBalls = array_combine($balls,$quantity);
         $bucketCapacities = Bucket::get()->pluck('remaining_volume','bucket_name')->toArray();
+        arsort($bucketCapacities);
+       // dd($bucketCapacities);
         $ballSizes = Ball::get()->pluck('volume','ball_name')->toArray();
         
         //dd($purchasedBalls,$bucketCapacities,$ballSizes);
@@ -62,7 +64,6 @@ class BallController extends Controller
         $bucketCapacities = $bucketCapacities;
         $ballSizes = $ballSizes;
         $purchasedBalls = $purchasedBalls;
-
         $result = $this->storeBallsInBuckets($bucketCapacities, $ballSizes, $purchasedBalls);
         $bucketTotalData = Bucket::get()->toArray();
         return view('bucket_suggestion_result', ['result' => $result, 'bucketTotalData' => $bucketTotalData, 'purchasedBalls' => $purchasedBalls,'ballSizes' => $ballSizes]);
@@ -82,9 +83,10 @@ class BallController extends Controller
                 $bucketSelected = false;
     
                 // Try to put the ball in each bucket
+                
                 foreach ($buckets as $bucket => &$balls) {
                     if ($bucketCapacities[$bucket] >= $ballSize) 
-                    {
+                    { 
                         $bucketData = Bucket::select('id')->where('bucket_name',$bucket)->get();
                         //deduct capacity from bucket table
                         $bucketDeduct = Bucket::find($bucketData[0]->id);
