@@ -53,20 +53,41 @@ class BallController extends Controller
         $balls = $request->balls;
         $quantity = $request->quantity;
         $purchasedBalls = array_combine($balls,$quantity);
-        $bucketCapacities = Bucket::get()->pluck('remaining_volume','bucket_name')->toArray();
-        arsort($bucketCapacities);
-       // dd($bucketCapacities);
-        $ballSizes = Ball::get()->pluck('volume','ball_name')->toArray();
         
+        $bucketCapacities = Bucket::get()->pluck('remaining_volume','bucket_name')->toArray();
+        arsort($bucketCapacities); //sort in desending order
+        
+        $ballSizes = Ball::get()->pluck('volume','ball_name')->toArray();
+        $ballSizeValue = array_values($ballSizes);
+        $target = 0;
+        foreach($quantity as $key=>$value)
+        {
+            $target = $target + $value*$ballSizeValue[$key];
+        }
+        
+        $sortedBucketArray = $this->sortByNearestToTarget($bucketCapacities, $target);
+       // dd($target,$sortedBucketArray,$bucketCapacities);
         //dd($purchasedBalls,$bucketCapacities,$ballSizes);
 
         // Example usage
-        $bucketCapacities = $bucketCapacities;
+        $bucketCapacities = $sortedBucketArray;
         $ballSizes = $ballSizes;
         $purchasedBalls = $purchasedBalls;
         $result = $this->storeBallsInBuckets($bucketCapacities, $ballSizes, $purchasedBalls);
         $bucketTotalData = Bucket::get()->toArray();
         return view('bucket_suggestion_result', ['result' => $result, 'bucketTotalData' => $bucketTotalData, 'purchasedBalls' => $purchasedBalls,'ballSizes' => $ballSizes]);
+    }
+
+    //function to find nearest closet bucket_suggestion
+    function sortByNearestToTarget($array, $target) {
+        // Custom sorting function to compare absolute differences
+        uasort($array, function($a, $b) use ($target) {
+            $diffA = abs($a - $target);
+            $diffB = abs($b - $target);
+            return $diffA - $diffB;
+        });
+    
+        return $array;
     }
 
     //Main function to calculate result
